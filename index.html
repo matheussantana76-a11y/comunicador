@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Preciso de...</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F0EB;
+    --ink: #1A1A2E;
+    --paper: #FFFFFF;
+    --radius: 24px;
+  }
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body{
+    margin:0; padding:0; height:100%; width:100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+    user-select: none;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body::before{
+    content:''; position:fixed; inset:0;
+    background: radial-gradient(ellipse at 25% 40%, rgba(59,130,246,0.05) 0%, transparent 65%),
+                radial-gradient(ellipse at 75% 60%, rgba(245,158,11,0.04) 0%, transparent 65%);
+    pointer-events:none; z-index:0;
+  }
+
+  #banner{
+    position:fixed; top:0; left:0; right:0;
+    height: clamp(76px, 16dvh, 130px);
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 clamp(16px, 4vw, 40px);
+    padding-right: calc(clamp(16px, 4vw, 40px) + env(safe-area-inset-right));
+    padding-left: calc(clamp(16px, 4vw, 40px) + env(safe-area-inset-left));
+    background: var(--paper);
+    border-bottom: 1px solid rgba(26,26,46,0.06);
+    transition: background 0.4s cubic-bezier(0.22,1,0.36,1), color 0.3s ease;
+    z-index:5;
+    box-shadow: 0 1px 3px rgba(26,26,46,0.06);
+  }
+  #banner.ativo{ border-bottom-color:transparent; box-shadow:0 4px 16px rgba(26,26,46,0.12); }
+  #banner .lado-esq{ display:flex; align-items:center; gap: clamp(10px, 2.5vw, 24px); }
+  #banner .emoji{ font-size: clamp(36px, 7dvh, 64px); line-height:1; }
+  #banner .texto{
+    font-size: clamp(18px, 2.8dvh, 28px);
+    font-weight:700; max-width:55vw; line-height:1.2;
+  }
+  #banner .texto small{
+    display:block; font-weight:500;
+    font-size: clamp(12px, 1.5dvh, 16px);
+    opacity:0.7; margin-top:3px;
+  }
+  #repetirBtn{
+    font-size: clamp(14px, 2dvh, 18px);
+    font-weight:700; border:none; border-radius:999px;
+    padding: clamp(10px, 1.4dvh, 16px) clamp(16px, 2.5vw, 28px);
+    background: var(--ink); color:#fff; cursor:pointer;
+    display:none; align-items:center; gap:8px;
+    opacity:0; transform:scale(0.9);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow:0 4px 12px rgba(26,26,46,0.2);
+    touch-action:manipulation;
+  }
+  #repetirBtn.mostrar{ display:flex; opacity:1; transform:scale(1); }
+  #repetirBtn:active{ transform:scale(0.94); }
+
+  #grid{
+    position:fixed; top:clamp(76px, 16dvh, 130px); left:0; right:0; bottom:0;
+    display:grid;
+    padding: clamp(10px, 1.6dvh, 20px);
+    gap: clamp(8px, 1.4dvh, 16px);
+    z-index:1;
+  }
+  @media (min-width: 1101px){
+    #grid{ grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(2,1fr); }
+  }
+  @media (min-width: 821px) and (max-width: 1100px){
+    #grid{ grid-template-columns:repeat(4,1fr); }
+  }
+  @media (min-width: 601px) and (max-width: 820px){
+    #grid{ grid-template-columns:repeat(3,1fr); }
+  }
+  @media (max-width: 600px){
+    #grid{ grid-template-columns:repeat(2,1fr); }
+    #banner{ height:clamp(64px, 14dvh, 100px); }
+  }
+
+  .tile{
+    border:none; border-radius:var(--radius);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap: clamp(4px, 0.8dvh, 10px);
+    cursor:pointer; color:#fff;
+    box-shadow:0 4px 0 rgba(0,0,0,0.15), 0 6px 20px rgba(0,0,0,0.1);
+    transform:translateY(0);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.2s ease;
+    touch-action:manipulation; position:relative; overflow:hidden;
+  }
+  .tile::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+    border-radius:inherit; pointer-events:none;
+  }
+  .tile .emoji{ font-size:clamp(42px, 8dvh, 72px); position:relative; z-index:1; }
+  .tile .label{
+    font-size:clamp(26px, 6dvh, 48px);
+    font-weight:800; letter-spacing:0.3px;
+    position:relative; z-index:1;
+    text-shadow:0 1px 3px rgba(0,0,0,0.12);
+  }
+  .tile:active, .tile.pulso{
+    transform:translateY(3px);
+    box-shadow:0 1px 0 rgba(0,0,0,0.15), 0 3px 8px rgba(0,0,0,0.08);
+    filter:brightness(1.1);
+  }
+  @media (hover:hover){
+    .tile:hover{
+      transform:translateY(-2px);
+      box-shadow:0 6px 0 rgba(0,0,0,0.15), 0 10px 28px rgba(0,0,0,0.15);
+      filter:brightness(1.05);
+    }
+    .tile:hover::after{
+      background:linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 55%);
+    }
+  }
+  .tile:focus-visible{ outline:3px solid var(--ink); outline-offset:3px; }
+
+  @keyframes tileIn{
+    from{ opacity:0; transform:translateY(14px) scale(0.95); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .tile{
+    animation:tileIn 0.4s cubic-bezier(0.22,1,0.36,1) backwards;
+  }
+  .tile:nth-child(1){ animation-delay:0.02s; }
+  .tile:nth-child(2){ animation-delay:0.04s; }
+  .tile:nth-child(3){ animation-delay:0.06s; }
+  .tile:nth-child(4){ animation-delay:0.08s; }
+  .tile:nth-child(5){ animation-delay:0.10s; }
+  .tile:nth-child(6){ animation-delay:0.12s; }
+  .tile:nth-child(7){ animation-delay:0.14s; }
+  .tile:nth-child(8){ animation-delay:0.16s; }
+  .tile:nth-child(9){ animation-delay:0.18s; }
+  .tile:nth-child(10){ animation-delay:0.20s; }
+
+  #telaCheiaBtn{
+    position:fixed; top:clamp(8px, 1dvh, 14px); right:clamp(8px, 1dvh, 14px);
+    z-index:10;
+    width:clamp(36px, 5dvh, 48px);
+    height:clamp(36px, 5dvh, 48px);
+    border-radius:50%; border:none;
+    background:rgba(26,26,46,0.06);
+    font-size:clamp(16px, 2.2dvh, 22px);
+    cursor:pointer; color:var(--ink);
+    transition: background 0.2s ease, transform 0.2s ease;
+    display:flex; align-items:center; justify-content:center;
+    touch-action:manipulation;
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+  }
+  #telaCheiaBtn:active{ background:rgba(26,26,46,0.12); transform:scale(0.92); }
+  @media (hover:hover){ #telaCheiaBtn:hover{ background:rgba(26,26,46,0.1); } }
+</style>
+</head>
+<body>
+
+<div id="banner">
+  <div class="lado-esq">
+    <div class="emoji" id="bannerEmoji">🗣️</div>
+    <div class="texto" id="bannerTexto">
+      Toque em um ícone para falar
+      <small>Toque em um ícone para falar</small>
+    </div>
+  </div>
+  <button id="repetirBtn">🔁 Repetir</button>
+</div>
+
+<div id="grid"></div>
+
+<button id="telaCheiaBtn" title="Tela cheia">⛶</button>
+
+<script>
+  const NECESSIDADES = [
+    { emoji: '💧', label: 'Sede',     frase: 'Estou com sede. Preciso de água.',        cor: '#3B82F6' },
+    { emoji: '🍽️', label: 'Fome',     frase: 'Estou com fome.',                          cor: '#F59E0B' },
+    { emoji: '🚻', label: 'Banheiro', frase: 'Preciso ir ao banheiro.',                  cor: '#10B981' },
+    { emoji: '⚠️', label: 'Dor',      frase: 'Estou sentindo dor.',                      cor: '#EF4444' },
+    { emoji: '🥶', label: 'Frio',     frase: 'Estou com frio.',                          cor: '#38BDF8' },
+    { emoji: '🥵', label: 'Calor',    frase: 'Estou com calor.',                          cor: '#F97316' },
+    { emoji: '😴', label: 'Cansaço',  frase: 'Estou cansado. Preciso descansar.',        cor: '#8B5CF6' },
+    { emoji: '🆘', label: 'Ajuda',    frase: 'Preciso de ajuda agora.',                  cor: '#DC2626' },
+    { emoji: '✅', label: 'Sim',      frase: 'Sim.',                                     cor: '#22C55E' },
+    { emoji: '❌', label: 'Não',      frase: 'Não.',                                      cor: '#6B7280' },
+  ];
+
+  const grid = document.getElementById('grid');
+  const banner = document.getElementById('banner');
+  const bannerEmoji = document.getElementById('bannerEmoji');
+  const bannerTexto = document.getElementById('bannerTexto');
+  const repetirBtn = document.getElementById('repetirBtn');
+
+  let ultimaFrase = '';
+
+  function falar(texto){
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(texto);
+    u.lang = 'pt-BR';
+    u.rate = 0.95;
+    u.pitch = 1.0;
+    const voices = speechSynthesis.getVoices();
+    const brVoice = voices.find(v => v.lang.startsWith('pt-BR'));
+    if(brVoice) u.voice = brVoice;
+    speechSynthesis.speak(u);
+  }
+
+  function acionar(item, tileEl){
+    ultimaFrase = item.frase;
+    banner.classList.add('ativo');
+    banner.style.background = item.cor;
+    banner.style.color = '#fff';
+    bannerEmoji.textContent = item.emoji;
+    bannerTexto.innerHTML = `${item.label}<small>${item.frase}</small>`;
+    repetirBtn.classList.add('mostrar');
+    falar(item.frase);
+    if(navigator.vibrate) navigator.vibrate(60);
+    tileEl.classList.add('pulso');
+    setTimeout(() => tileEl.classList.remove('pulso'), 200);
+  }
+
+  if('speechSynthesis' in window) speechSynthesis.getVoices();
+
+  NECESSIDADES.forEach((item, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tile';
+    btn.style.background = item.cor;
+    btn.setAttribute('aria-label', item.label + ': ' + item.frase);
+    btn.innerHTML = `<span class="emoji">${item.emoji}</span><span class="label">${item.label}</span>`;
+    btn.addEventListener('click', () => acionar(item, btn));
+    grid.appendChild(btn);
+  });
+
+  repetirBtn.addEventListener('click', () => { if(ultimaFrase) falar(ultimaFrase); });
+
+  telaCheiaBtn.addEventListener('click', () => {
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(()=>{});
+    } else {
+      document.exitFullscreen();
+    }
+  });
+
+  if('wakeLock' in navigator){
+    let wakeLock = null;
+    async function requestWakeLock(){
+      try{ wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+    }
+    requestWakeLock();
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'visible' && !wakeLock) requestWakeLock();
+    });
+  }
+</script>
+</body>
+</html>
