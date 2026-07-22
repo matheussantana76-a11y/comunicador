@@ -34,6 +34,9 @@
     pointer-events:none; z-index:0;
   }
 
+  .tela{ position:fixed; inset:0; z-index:1; }
+  .tela[hidden]{ display:none; }
+
   #banner{
     position:fixed; top:0; left:0; right:0;
     height: clamp(76px, 16dvh, 130px);
@@ -59,19 +62,22 @@
     font-size: clamp(12px, 1.5dvh, 16px);
     opacity:0.7; margin-top:3px;
   }
-  #repetirBtn{
-    font-size: clamp(14px, 2dvh, 18px);
+  #botoesBanner{ display:flex; gap:clamp(8px, 1.5vw, 14px); align-items:center; }
+
+  .btn-pill{
+    font-size: clamp(13px, 1.8dvh, 17px);
     font-weight:700; border:none; border-radius:999px;
-    padding: clamp(10px, 1.4dvh, 16px) clamp(16px, 2.5vw, 28px);
+    padding: clamp(10px, 1.4dvh, 16px) clamp(14px, 2.5vw, 24px);
     background: var(--ink); color:#fff; cursor:pointer;
     display:none; align-items:center; gap:8px;
     opacity:0; transform:scale(0.9);
     transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
     box-shadow:0 4px 12px rgba(26,26,46,0.2);
-    touch-action:manipulation;
+    touch-action:manipulation; white-space:nowrap;
   }
-  #repetirBtn.mostrar{ display:flex; opacity:1; transform:scale(1); }
-  #repetirBtn:active{ transform:scale(0.94); }
+  .btn-pill.mostrar{ display:flex; opacity:1; transform:scale(1); }
+  .btn-pill:active{ transform:scale(0.94); }
+  #menteBtn{ background:#7C3AED; }
 
   #grid{
     position:fixed; top:clamp(76px, 16dvh, 130px); left:0; right:0; bottom:0;
@@ -137,9 +143,7 @@
     from{ opacity:0; transform:translateY(14px) scale(0.95); }
     to{ opacity:1; transform:translateY(0) scale(1); }
   }
-  .tile{
-    animation:tileIn 0.4s cubic-bezier(0.22,1,0.36,1) backwards;
-  }
+  .tile{ animation:tileIn 0.4s cubic-bezier(0.22,1,0.36,1) backwards; }
   .tile:nth-child(1){ animation-delay:0.02s; }
   .tile:nth-child(2){ animation-delay:0.04s; }
   .tile:nth-child(3){ animation-delay:0.06s; }
@@ -168,37 +172,318 @@
   }
   #telaCheiaBtn:active{ background:rgba(26,26,46,0.12); transform:scale(0.92); }
   @media (hover:hover){ #telaCheiaBtn:hover{ background:rgba(26,26,46,0.1); } }
+
+  /* ========================================
+     JOGO DA MEMORIA
+     ======================================== */
+
+  #jogoBanner{
+    position:fixed; top:0; left:0; right:0;
+    height: clamp(76px, 16dvh, 130px);
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 clamp(16px, 4vw, 40px);
+    padding-right: calc(clamp(16px, 4vw, 40px) + env(safe-area-inset-right));
+    padding-left: calc(clamp(16px, 4vw, 40px) + env(safe-area-inset-left));
+    background: var(--paper);
+    border-bottom: 1px solid rgba(26,26,46,0.06);
+    z-index:5;
+    box-shadow:0 1px 3px rgba(26,26,46,0.06);
+    transition: background 0.4s ease, color 0.3s ease;
+  }
+  #jogoBanner .lado-esq{ display:flex; align-items:center; gap:clamp(10px, 2.5vw, 24px); }
+  #jogoBanner .emoji{ font-size:clamp(36px, 7dvh, 64px); line-height:1; }
+  #jogoBanner .texto{
+    font-size:clamp(18px, 2.8dvh, 28px);
+    font-weight:700; line-height:1.2;
+  }
+  #jogoBanner .texto small{
+    display:block; font-weight:500;
+    font-size:clamp(12px, 1.5dvh, 16px);
+    opacity:0.7; margin-top:3px;
+  }
+  #jogoBotoes{ display:flex; gap:clamp(8px, 1.2vw, 14px); align-items:center; }
+
+  .btn-voltar{
+    font-size:clamp(14px, 2dvh, 18px);
+    font-weight:700; border:none; border-radius:999px;
+    padding:clamp(10px, 1.4dvh, 16px) clamp(16px, 2.5vw, 28px);
+    background:var(--ink); color:#fff; cursor:pointer;
+    display:flex; align-items:center; gap:8px;
+    transition:transform 0.2s ease;
+    box-shadow:0 4px 12px rgba(26,26,46,0.2);
+    touch-action:manipulation;
+  }
+  .btn-voltar:active{ transform:scale(0.94); }
+
+  #jogoCorpo{
+    position:fixed; top:clamp(76px, 16dvh, 130px); left:0; right:0; bottom:0;
+    display:flex; align-items:center; justify-content:center;
+    z-index:1;
+  }
+
+  .nivel-botoes{
+    display:flex; flex-direction:column;
+    gap:clamp(14px, 2.5dvh, 28px);
+    padding:clamp(20px, 4vw, 40px);
+    width:100%; max-width:500px;
+    animation:tileIn 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+  .nivel-titulo{
+    text-align:center;
+    font-size:clamp(22px, 3.5dvh, 36px);
+    font-weight:800;
+    margin-bottom:clamp(4px, 1dvh, 10px);
+  }
+  .nivel-btn{
+    border:none; border-radius:var(--radius);
+    padding:clamp(18px, 3dvh, 30px);
+    cursor:pointer; color:#fff; text-align:left;
+    display:flex; align-items:center; gap:clamp(14px, 2vw, 24px);
+    box-shadow:0 4px 0 rgba(0,0,0,0.15), 0 6px 20px rgba(0,0,0,0.1);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    touch-action:manipulation; position:relative; overflow:hidden;
+  }
+  .nivel-btn::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+    border-radius:inherit; pointer-events:none;
+  }
+  .nivel-btn:active{
+    transform:translateY(3px);
+    box-shadow:0 1px 0 rgba(0,0,0,0.15), 0 3px 8px rgba(0,0,0,0.08);
+  }
+  .nivel-btn .nivel-icon{
+    font-size:clamp(36px, 6dvh, 56px);
+    position:relative; z-index:1; flex-shrink:0;
+  }
+  .nivel-btn .nivel-info{ position:relative; z-index:1; }
+  .nivel-btn .nivel-info .nivel-nome{
+    font-size:clamp(20px, 3.5dvh, 32px);
+    font-weight:800; display:block;
+  }
+  .nivel-btn .nivel-info .nivel-desc{
+    font-size:clamp(12px, 1.6dvh, 16px);
+    font-weight:500; opacity:0.85; margin-top:2px; display:block;
+  }
+
+  #jogoGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:clamp(8px, 1.4dvh, 16px);
+    padding:clamp(10px, 1.6dvh, 20px);
+    width:100%; height:100%;
+  }
+
+  .card{
+    perspective:1000px;
+    cursor:pointer;
+    touch-action:manipulation;
+    animation:tileIn 0.35s cubic-bezier(0.22,1,0.36,1) backwards;
+  }
+  .card-inner{
+    position:relative;
+    width:100%; height:100%;
+    transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);
+    transform-style:preserve-3d;
+  }
+  .card.virada .card-inner,
+  .card.acertou .card-inner{
+    transform:rotateY(180deg);
+  }
+  .card-face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    border-radius:var(--radius);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+  }
+  .card-frente{
+    background:var(--ink);
+    box-shadow:0 4px 0 rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.12);
+    color:#fff;
+  }
+  .card-frente .card-interrog{
+    font-size:clamp(32px, 7dvh, 60px);
+    font-weight:800;
+    opacity:0.25;
+  }
+  .card-verso{
+    transform:rotateY(180deg);
+    color:#fff;
+    box-shadow:0 4px 0 rgba(0,0,0,0.15), 0 6px 20px rgba(0,0,0,0.1);
+  }
+  .card-verso .card-emoji{
+    font-size:clamp(36px, 7dvh, 64px);
+  }
+
+  .card.virada .card-frente,
+  .card.acertou .card-frente{
+    box-shadow:0 1px 0 rgba(0,0,0,0.15), 0 3px 8px rgba(0,0,0,0.08);
+  }
+  .card.virada .card-verso,
+  .card.acertou .card-verso{
+    box-shadow:0 4px 0 rgba(0,0,0,0.15), 0 6px 20px rgba(0,0,0,0.1);
+  }
+  .card.acertou .card-verso{
+    box-shadow:0 0 0 3px rgba(255,255,255,0.6), 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .card.errou .card-inner{
+    animation:shake 0.4s ease;
+  }
+  @keyframes shake{
+    0%,100%{ transform:rotateY(180deg) translateX(0); }
+    25%{ transform:rotateY(180deg) translateX(-6px); }
+    75%{ transform:rotateY(180deg) translateX(6px); }
+  }
+
+  @keyframes cardPulse{
+    0%{ transform:scale(1); }
+    50%{ transform:scale(1.06); }
+    100%{ transform:scale(1); }
+  }
+  .card.acertou{
+    animation:cardPulse 0.35s ease;
+  }
+
+  #vitoriaOverlay{
+    position:fixed; inset:0;
+    background:rgba(26,26,46,0.6);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    z-index:20;
+    display:none; align-items:center; justify-content:center;
+  }
+  #vitoriaOverlay.mostrar{ display:flex; }
+  #vitoriaCard{
+    background:var(--paper);
+    border-radius:var(--radius);
+    padding:clamp(28px, 5vw, 48px);
+    text-align:center;
+    box-shadow:0 20px 60px rgba(26,26,46,0.3);
+    animation:tileIn 0.5s cubic-bezier(0.22,1,0.36,1);
+    max-width:90vw;
+  }
+  #vitoriaCard .vitoria-emoji{
+    font-size:clamp(52px, 10dvh, 80px);
+    margin-bottom:clamp(8px, 1.5dvh, 16px);
+    animation:cardPulse 1s ease infinite;
+  }
+  #vitoriaCard .vitoria-titulo{
+    font-size:clamp(22px, 3.5dvh, 36px);
+    font-weight:800; margin-bottom:clamp(4px, 1dvh, 10px);
+  }
+  #vitoriaCard .vitoria-sub{
+    font-size:clamp(14px, 2dvh, 20px);
+    opacity:0.7; margin-bottom:clamp(16px, 3dvh, 32px);
+    font-weight:500;
+  }
+  #vitoriaCard .vitoria-botoes{
+    display:flex; gap:clamp(8px, 1.5vw, 14px); justify-content:center; flex-wrap:wrap;
+  }
+  #vitoriaCard .btn-nivel{
+    font-size:clamp(14px, 2dvh, 18px);
+    font-weight:700; border:none; border-radius:999px;
+    padding:clamp(12px, 1.6dvh, 18px) clamp(20px, 3vw, 32px);
+    cursor:pointer; color:#fff; touch-action:manipulation;
+    transition:transform 0.2s ease;
+    box-shadow:0 4px 12px rgba(26,26,46,0.2);
+  }
+  #vitoriaCard .btn-nivel:active{ transform:scale(0.94); }
 </style>
 </head>
 <body>
 
-<div id="banner">
-  <div class="lado-esq">
-    <div class="emoji" id="bannerEmoji">🗣️</div>
-    <div class="texto" id="bannerTexto">
-      Toque em um ícone para falar
-      <small>Toque em um ícone para falar</small>
+<div id="telaCheiaBtn" title="Tela cheia">⛶</div>
+
+<!-- TELA DO COMUNICADOR -->
+<div class="tela" id="telaComunicador">
+  <div id="banner">
+    <div class="lado-esq">
+      <div class="emoji" id="bannerEmoji">🗣️</div>
+      <div class="texto" id="bannerTexto">
+        Toque em um ícone para falar
+        <small>Toque em um ícone para falar</small>
+      </div>
+    </div>
+    <div id="botoesBanner">
+      <button class="btn-pill" id="repetirBtn">🔁 Repetir</button>
+      <button class="btn-pill" id="menteBtn">🧠 Ativar Mente</button>
     </div>
   </div>
-  <button id="repetirBtn">🔁 Repetir</button>
+  <div id="grid"></div>
 </div>
 
-<div id="grid"></div>
-
-<button id="telaCheiaBtn" title="Tela cheia">⛶</button>
+<!-- TELA DO JOGO DA MEMORIA -->
+<div class="tela" id="telaJogo" hidden>
+  <div id="jogoBanner">
+    <div class="lado-esq">
+      <div class="emoji" id="jogoEmoji">🧠</div>
+      <div class="texto" id="jogoTexto">
+        Jogo da Memória
+        <small id="jogoSub">Encontre os pares</small>
+      </div>
+    </div>
+    <div id="jogoBotoes">
+      <button class="btn-voltar" id="voltarBtn">← Voltar</button>
+    </div>
+  </div>
+  <div id="jogoCorpo">
+    <div id="jogoNiveis" class="nivel-botoes">
+      <div class="nivel-titulo">Escolha o nível</div>
+      <button class="nivel-btn" data-nivel="4" style="background:#3B82F6">
+        <span class="nivel-icon">⭐</span>
+        <span class="nivel-info">
+          <span class="nivel-nome">Fácil</span>
+          <span class="nivel-desc">4 pares — 8 cartas</span>
+        </span>
+      </button>
+      <button class="nivel-btn" data-nivel="6" style="background:#F59E0B">
+        <span class="nivel-icon">⭐⭐</span>
+        <span class="nivel-info">
+          <span class="nivel-nome">Médio</span>
+          <span class="nivel-desc">6 pares — 12 cartas</span>
+        </span>
+      </button>
+      <button class="nivel-btn" data-nivel="8" style="background:#EF4444">
+        <span class="nivel-icon">⭐⭐⭐</span>
+        <span class="nivel-info">
+          <span class="nivel-nome">Difícil</span>
+          <span class="nivel-desc">8 pares — 16 cartas</span>
+        </span>
+      </button>
+    </div>
+    <div id="jogoGrid" style="display:none"></div>
+  </div>
+  <div id="vitoriaOverlay">
+    <div id="vitoriaCard">
+      <div class="vitoria-emoji">🎉</div>
+      <div class="vitoria-titulo">Parabéns!</div>
+      <div class="vitoria-sub" id="vitoriaSub">Você encontrou todos os pares!</div>
+      <div class="vitoria-botoes">
+        <button class="btn-nivel" id="jogarNovamenteBtn" style="background:#7C3AED">Jogar de novo</button>
+        <button class="btn-nivel" id="proximoNivelBtn" style="background:#3B82F6">Próximo nível</button>
+        <button class="btn-nivel" id="voltarMenuBtn" style="background:var(--ink)">← Comunicador</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
+  /* ==========================================
+     COMUNICADOR
+     ========================================== */
   const NECESSIDADES = [
-    { emoji: '💧', label: 'Sede',     frase: 'Estou com sede. Preciso de água.',        cor: '#3B82F6' },
-    { emoji: '🍽️', label: 'Fome',     frase: 'Estou com fome.',                          cor: '#F59E0B' },
-    { emoji: '🚻', label: 'Banheiro', frase: 'Preciso ir ao banheiro.',                  cor: '#10B981' },
-    { emoji: '⚠️', label: 'Dor',      frase: 'Estou sentindo dor.',                      cor: '#EF4444' },
-    { emoji: '🥶', label: 'Frio',     frase: 'Estou com frio.',                          cor: '#38BDF8' },
-    { emoji: '🥵', label: 'Calor',    frase: 'Estou com calor.',                          cor: '#F97316' },
-    { emoji: '😴', label: 'Cansaço',  frase: 'Estou cansado. Preciso descansar.',        cor: '#8B5CF6' },
-    { emoji: '🆘', label: 'Ajuda',    frase: 'Preciso de ajuda agora.',                  cor: '#DC2626' },
-    { emoji: '✅', label: 'Sim',      frase: 'Sim.',                                     cor: '#22C55E' },
-    { emoji: '❌', label: 'Não',      frase: 'Não.',                                      cor: '#6B7280' },
+    { emoji:'💧', label:'Sede',     frase:'Estou com sede. Preciso de água.',     cor:'#3B82F6' },
+    { emoji:'🍽️', label:'Fome',     frase:'Estou com fome.',                       cor:'#F59E0B' },
+    { emoji:'🚻', label:'Banheiro', frase:'Preciso ir ao banheiro.',               cor:'#10B981' },
+    { emoji:'⚠️', label:'Dor',      frase:'Estou sentindo dor.',                   cor:'#EF4444' },
+    { emoji:'🥶', label:'Frio',     frase:'Estou com frio.',                       cor:'#38BDF8' },
+    { emoji:'🥵', label:'Calor',    frase:'Estou com calor.',                       cor:'#F97316' },
+    { emoji:'😴', label:'Cansaço',  frase:'Estou cansado. Preciso descansar.',     cor:'#8B5CF6' },
+    { emoji:'🆘', label:'Ajuda',    frase:'Preciso de ajuda agora.',               cor:'#DC2626' },
+    { emoji:'✅', label:'Sim',      frase:'Sim.',                                  cor:'#22C55E' },
+    { emoji:'❌', label:'Não',      frase:'Não.',                                   cor:'#6B7280' },
   ];
 
   const grid = document.getElementById('grid');
@@ -206,6 +491,9 @@
   const bannerEmoji = document.getElementById('bannerEmoji');
   const bannerTexto = document.getElementById('bannerTexto');
   const repetirBtn = document.getElementById('repetirBtn');
+  const menteBtn = document.getElementById('menteBtn');
+  const telaComunicador = document.getElementById('telaComunicador');
+  const telaJogo = document.getElementById('telaJogo');
 
   let ultimaFrase = '';
 
@@ -230,6 +518,7 @@
     bannerEmoji.textContent = item.emoji;
     bannerTexto.innerHTML = `${item.label}<small>${item.frase}</small>`;
     repetirBtn.classList.add('mostrar');
+    menteBtn.classList.add('mostrar');
     falar(item.frase);
     if(navigator.vibrate) navigator.vibrate(60);
     tileEl.classList.add('pulso');
@@ -238,7 +527,7 @@
 
   if('speechSynthesis' in window) speechSynthesis.getVoices();
 
-  NECESSIDADES.forEach((item, i) => {
+  NECESSIDADES.forEach((item) => {
     const btn = document.createElement('button');
     btn.className = 'tile';
     btn.style.background = item.cor;
@@ -268,6 +557,204 @@
       if(document.visibilityState === 'visible' && !wakeLock) requestWakeLock();
     });
   }
+
+  /* ==========================================
+     NAVEGACAO ENTRE TELAS
+     ========================================== */
+  menteBtn.addEventListener('click', () => {
+    telaComunicador.hidden = true;
+    telaJogo.hidden = false;
+    mostrarMenuNiveis();
+  });
+
+  document.getElementById('voltarBtn').addEventListener('click', () => {
+    telaJogo.hidden = true;
+    telaComunicador.hidden = false;
+  });
+
+  document.getElementById('voltarMenuBtn').addEventListener('click', () => {
+    document.getElementById('vitoriaOverlay').classList.remove('mostrar');
+    telaJogo.hidden = true;
+    telaComunicador.hidden = false;
+  });
+
+  /* ==========================================
+     JOGO DA MEMORIA
+     ========================================== */
+  const EMOJIS_JOGO = [
+    { emoji:'💧', cor:'#3B82F6' },
+    { emoji:'🍽️', cor:'#F59E0B' },
+    { emoji:'🚻', cor:'#10B981' },
+    { emoji:'⚠️', cor:'#EF4444' },
+    { emoji:'🥶', cor:'#38BDF8' },
+    { emoji:'🥵', cor:'#F97316' },
+    { emoji:'😴', cor:'#8B5CF6' },
+    { emoji:'🆘', cor:'#DC2626' },
+  ];
+
+  const jogoNiveis = document.getElementById('jogoNiveis');
+  const jogoGrid = document.getElementById('jogoGrid');
+  const jogoEmoji = document.getElementById('jogoEmoji');
+  const jogoTexto = document.getElementById('jogoTexto');
+  const jogoSub = document.getElementById('jogoSub');
+  const vitoriaOverlay = document.getElementById('vitoriaOverlay');
+  const vitoriaSub = document.getElementById('vitoriaSub');
+
+  let nivelAtual = 4;
+  let cartas = [];
+  let cartaVirada = null;
+  let bloqueado = false;
+  let paresEncontrados = 0;
+  let tentativas = 0;
+  let inicioJogo = 0;
+
+  function embaralhar(arr){
+    const a = [...arr];
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function mostrarMenuNiveis(){
+    jogoNiveis.style.display = '';
+    jogoGrid.style.display = 'none';
+    jogoEmoji.textContent = '🧠';
+    jogoTexto.innerHTML = 'Jogo da Memória<small id="jogoSub">Escolha o nível</small>';
+    vitoriaOverlay.classList.remove('mostrar');
+  }
+
+  function iniciarJogo(numPares){
+    nivelAtual = numPares;
+    paresEncontrados = 0;
+    tentativas = 0;
+    cartaVirada = null;
+    bloqueado = false;
+    cartas = [];
+    inicioJogo = Date.now();
+
+    const emojis = EMOJIS_JOGO.slice(0, numPares);
+    const pares = [...emojis, ...emojis];
+    cartas = embaralhar(pares);
+
+    jogoNiveis.style.display = 'none';
+    jogoGrid.style.display = '';
+
+    let cols = numPares <= 4 ? 4 : numPares <= 6 ? 4 : 4;
+    if(numPares === 6) cols = 4;
+    if(numPares === 4) cols = 4;
+    jogoGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+    let nomeNivel = numPares === 4 ? 'Fácil' : numPares === 6 ? 'Médio' : 'Difícil';
+    jogoEmoji.textContent = '🧠';
+    jogoTexto.innerHTML = `${nomeNivel}<small id="jogoSub">Pares: 0/${numPares} — Toque nas cartas</small>`;
+    jogoSub = document.getElementById('jogoSub');
+
+    jogoGrid.innerHTML = '';
+    cartas.forEach((item, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.animationDelay = `${i * 0.03}s`;
+      card.dataset.index = i;
+      card.dataset.emoji = item.emoji;
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-face card-frente" style="background:var(--ink)">
+            <span class="card-interrog">?</span>
+          </div>
+          <div class="card-face card-verso" style="background:${item.cor}">
+            <span class="card-emoji">${item.emoji}</span>
+          </div>
+        </div>
+      `;
+      card.addEventListener('click', () => virarCarta(card));
+      jogoGrid.appendChild(card);
+    });
+  }
+
+  function virarCarta(card){
+    if(bloqueado) return;
+    if(card.classList.contains('virada') || card.classList.contains('acertou')) return;
+
+    card.classList.add('virada');
+    if(navigator.vibrate) navigator.vibrate(30);
+
+    if(!cartaVirada){
+      cartaVirada = card;
+      return;
+    }
+
+    tentativas++;
+    bloqueado = true;
+    const primeira = cartaVirada;
+    const segunda = card;
+
+    if(primeira.dataset.emoji === segunda.dataset.emoji){
+      primeira.classList.add('acertou');
+      segunda.classList.add('acertou');
+      paresEncontrados++;
+      if(navigator.vibrate) navigator.vibrate([60, 40, 60]);
+
+      const nomeNivel = nivelAtual === 4 ? 'Fácil' : nivelAtual === 6 ? 'Médio' : 'Difícil';
+      jogoTexto.innerHTML = `${nomeNivel}<small id="jogoSub">Pares: ${paresEncontrados}/${nivelAtual} — Toque nas cartas</small>`;
+      jogoSub = document.getElementById('jogoSub');
+
+      cartaVirada = null;
+      bloqueado = false;
+
+      if(paresEncontrados === nivelAtual){
+        setTimeout(mostrarVitoria, 500);
+      }
+    } else {
+      if(navigator.vibrate) navigator.vibrate(100);
+      primeira.classList.add('errou');
+      segunda.classList.add('errou');
+      setTimeout(() => {
+        primeira.classList.remove('virada', 'errou');
+        segunda.classList.remove('virada', 'errou');
+        cartaVirada = null;
+        bloqueado = false;
+      }, 900);
+    }
+  }
+
+  function mostrarVitoria(){
+    const segundos = Math.floor((Date.now() - inicioJogo) / 1000);
+    const min = Math.floor(segundos / 60);
+    const seg = segundos % 60;
+    const tempo = min > 0 ? `${min}min ${seg}s` : `${seg}s`;
+
+    let nomeNivel = nivelAtual === 4 ? 'Fácil' : nivelAtual === 6 ? 'Médio' : 'Difícil';
+    vitoriaSub.textContent = `${nomeNivel} — ${tentativas} tentativas — ${tempo}`;
+    vitoriaOverlay.classList.add('mostrar');
+
+    const proximoBtn = document.getElementById('proximoNivelBtn');
+    if(nivelAtual < 8){
+      proximoBtn.style.display = '';
+      proximoBtn.textContent = nivelAtual === 4 ? 'Médio →' : 'Difícil →';
+    } else {
+      proximoBtn.style.display = 'none';
+    }
+  }
+
+  document.querySelectorAll('.nivel-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const nivel = parseInt(btn.dataset.nivel);
+      iniciarJogo(nivel);
+    });
+  });
+
+  document.getElementById('jogarNovamenteBtn').addEventListener('click', () => {
+    vitoriaOverlay.classList.remove('mostrar');
+    iniciarJogo(nivelAtual);
+  });
+
+  document.getElementById('proximoNivelBtn').addEventListener('click', () => {
+    vitoriaOverlay.classList.remove('mostrar');
+    const proximo = nivelAtual === 4 ? 6 : 8;
+    iniciarJogo(proximo);
+  });
 </script>
 </body>
 </html>
