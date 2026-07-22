@@ -659,7 +659,6 @@
     let nomeNivel = numPares === 4 ? 'Fácil' : numPares === 6 ? 'Médio' : 'Difícil';
     jogoEmoji.textContent = '🧠';
     jogoTexto.innerHTML = `${nomeNivel}<small id="jogoSub">Pares: 0/${numPares} — Toque nas cartas</small>`;
-    jogoSub = document.getElementById('jogoSub');
 
     jogoGrid.innerHTML = '';
     cartas.forEach((item, i) => {
@@ -708,7 +707,6 @@
 
       const nomeNivel = nivelAtual === 4 ? 'Fácil' : nivelAtual === 6 ? 'Médio' : 'Difícil';
       jogoTexto.innerHTML = `${nomeNivel}<small id="jogoSub">Pares: ${paresEncontrados}/${nivelAtual} — Toque nas cartas</small>`;
-      jogoSub = document.getElementById('jogoSub');
 
       cartaVirada = null;
       bloqueado = false;
